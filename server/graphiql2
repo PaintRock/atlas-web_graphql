@@ -1,8 +1,36 @@
 {
-    task(id: "2") {
+    task(id: 1) {
       title
       weight
       description
     }
-  }
-  
+
+    task(id: 2) {
+        title
+        weight
+        description
+        project {
+          title
+        }
+      }
+    }
+        
+    project(id: 2) {
+      title
+      weight
+      description
+    }
+
+    {
+    project(id: 1) {
+        title
+        weight
+        description
+        tasks {
+            title
+            description
+          }
+        }
+      }
+      
+   

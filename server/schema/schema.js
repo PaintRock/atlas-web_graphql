@@ -15,6 +15,12 @@ const TaskType = new GraphQLObjectType({
     title: { type: GraphQLString },
     weight: { type: GraphQLInt },
     description: { type: GraphQLString }
+    project: {
+      type: ProjectType, // Specify the type to ProjectType
+      resolve(parent, args) {
+        return projects.find(project => project.id === parent.projectId);
+      }
+    }
   })
 });
 
@@ -26,6 +32,12 @@ const ProjectType = new GraphQLObjectType({
     title: { type: GraphQLString },
     weight: { type: GraphQLInt },
     description: { type: GraphQLString }
+    tasks: {
+      type: new GraphQLList(TaskType), // Specify the type to a list of TaskType
+      resolve(parent, args) {
+        return tasks.filter(task => task.projectId === parent.id);
+      }
+    }
   })
 });
 
@@ -49,19 +61,27 @@ const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: GraphQLString }
       },
-      resolve(parent, args) {
-        // Code to get task from database
-        // Dummy data for now
-        return tasks.find(task => task.id === args.id);
-      }
-    },
+  
   project: {
-    type: ProjectType,
+  type: ProjectType,
     args: {
       id: { type: GraphQLID } // Change type to GraphQLID
       },
       resolve(parent, args) {
         return projects.find(project => project.id === args.id);
+      }
+    }
+  
+    resolve(parent, args) {
+        // Code to get task from database
+        // Dummy data for now
+        return tasks.find(task => task.id === args.id);
+      }
+    },
+    projects: {
+      type: new GraphQLList(ProjectType), // Add new field projects of type GraphQLList of ProjectType
+      resolve(parent, args) {
+        return projects;
       }
     }
   }
