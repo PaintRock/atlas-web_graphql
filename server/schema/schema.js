@@ -3,7 +3,8 @@ const {
   GraphQLString,
   GraphQLInt,
   GraphQLSchema,
-  GraphQLID
+  GraphQLID,
+  GraphQLList // Add this import for GraphQLList
 } = require('graphql');
 const _ = require('lodash');
 
@@ -14,9 +15,9 @@ const TaskType = new GraphQLObjectType({
     id: { type: GraphQLString },
     title: { type: GraphQLString },
     weight: { type: GraphQLInt },
-    description: { type: GraphQLString }
+    description: { type: GraphQLString },
     project: {
-      type: ProjectType, // Specify the type to ProjectType
+      type: ProjectType,
       resolve(parent, args) {
         return projects.find(project => project.id === parent.projectId);
       }
@@ -24,16 +25,16 @@ const TaskType = new GraphQLObjectType({
   })
 });
 
-// Project Type
+// Define ProjectType
 const ProjectType = new GraphQLObjectType({
   name: 'Project',
   fields: () => ({
-    id: { type: GraphQLID }, // Change type to GraphQLID
+    id: { type: GraphQLID },
     title: { type: GraphQLString },
     weight: { type: GraphQLInt },
-    description: { type: GraphQLString }
+    description: { type: GraphQLString },
     tasks: {
-      type: new GraphQLList(TaskType), // Specify the type to a list of TaskType
+      type: new GraphQLList(TaskType),
       resolve(parent, args) {
         return tasks.filter(task => task.projectId === parent.id);
       }
@@ -61,25 +62,23 @@ const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: GraphQLString }
       },
-  
-  project: {
-  type: ProjectType,
-    args: {
-      id: { type: GraphQLID } // Change type to GraphQLID
-      },
       resolve(parent, args) {
-        return projects.find(project => project.id === args.id);
-      }
-    }
-  
-    resolve(parent, args) {
         // Code to get task from database
         // Dummy data for now
         return tasks.find(task => task.id === args.id);
       }
     },
+    project: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLID }
+      },
+      resolve(parent, args) {
+        return projects.find(project => project.id === args.id);
+      }
+    },
     projects: {
-      type: new GraphQLList(ProjectType), // Add new field projects of type GraphQLList of ProjectType
+      type: new GraphQLList(ProjectType),
       resolve(parent, args) {
         return projects;
       }
@@ -90,4 +89,3 @@ const RootQuery = new GraphQLObjectType({
 module.exports = new GraphQLSchema({
   query: RootQuery
 });
-
